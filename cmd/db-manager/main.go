@@ -66,18 +66,18 @@ func delete(ctx context.Context, r *repo.Repository) {
 	}
 }
 
-func parseRecords(path string) ([]model.DeviceToken, error) {
+func parseRecords(path string) ([]model.Device, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("parse records: %w", err)
 	}
 
-	var tt []model.DeviceToken
-	if err := json.Unmarshal(data, &tt); err != nil {
+	var dd []model.Device
+	if err := json.Unmarshal(data, &dd); err != nil {
 		return nil, fmt.Errorf("unmarshal records: %w", err)
 	}
 
-	return tt, nil
+	return dd, nil
 }
 
 func printTableDescription(desc *types.TableDescription) {

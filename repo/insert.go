@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -13,17 +12,10 @@ import (
 	"github.com/and-gorbik/dynamodb-device-token/model"
 )
 
-func (r *Repository) Put(ctx context.Context, t model.DeviceToken) error {
+func (r *Repository) Put(ctx context.Context, d model.Device) error {
 	out, err := r.client.PutItem(ctx, &dynamodb.PutItemInput{
-		TableName: aws.String(tableName),
-		Item: map[string]types.AttributeValue{
-			fieldUserID:      &types.AttributeValueMemberN{Value: strconv.FormatInt(t.UserID, 10)},
-			fieldKind:        &types.AttributeValueMemberS{Value: string(t.Kind)},
-			fieldModifiedAt:  &types.AttributeValueMemberN{Value: strconv.FormatInt(t.ModifiedAt, 10)},
-			fieldToken:       &types.AttributeValueMemberS{Value: t.Token},
-			fieldAppVersion:  &types.AttributeValueMemberS{Value: t.AppVersion},
-			fieldDeviceModel: &types.AttributeValueMemberS{Value: t.DeviceModel},
-		},
+		TableName:              aws.String(tableName),
+		Item:                   ToItem(&d),
 		ReturnConsumedCapacity: types.ReturnConsumedCapacityTotal,
 	})
 	if err != nil {
@@ -34,19 +26,12 @@ func (r *Repository) Put(ctx context.Context, t model.DeviceToken) error {
 	return nil
 }
 
-func (r *Repository) InsertBulk(ctx context.Context, tt []model.DeviceToken) error {
-	reqs := make([]types.WriteRequest, 0, len(tt))
-	for _, t := range tt {
+func (r *Repository) InsertBulk(ctx context.Context, dd []model.Device) error {
+	reqs := make([]types.WriteRequest, 0, len(dd))
+	for _, d := range dd {
 		reqs = append(reqs, types.WriteRequest{
 			PutRequest: &types.PutRequest{
-				Item: map[string]types.AttributeValue{
-					fieldUserID:      &types.AttributeValueMemberN{Value: strconv.FormatInt(t.UserID, 10)},
-					fieldKind:        &types.AttributeValueMemberS{Value: string(t.Kind)},
-					fieldModifiedAt:  &types.AttributeValueMemberN{Value: strconv.FormatInt(t.ModifiedAt, 10)},
-					fieldToken:       &types.AttributeValueMemberS{Value: t.Token},
-					fieldAppVersion:  &types.AttributeValueMemberS{Value: t.AppVersion},
-					fieldDeviceModel: &types.AttributeValueMemberS{Value: t.DeviceModel},
-				},
+				Item: ToItem(&d),
 			},
 		})
 	}
@@ -63,9 +48,9 @@ func (r *Repository) InsertBulk(ctx context.Context, tt []model.DeviceToken) err
 
 	for _, req := range out.UnprocessedItems[tableName] {
 		log.Printf(
-			"item (user_id='%s', kind='%s', token='%s') wasn't processed\n",
+			"item (user_id='%s', kind_device_model='%s', token='%s') wasn't processed\n",
 			req.PutRequest.Item[fieldUserID],
-			req.PutRequest.Item[fieldKind],
+			req.PutRequest.Item[fieldKindDeviceModel],
 			req.PutRequest.Item[fieldToken],
 		)
 	}

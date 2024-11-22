@@ -2,21 +2,23 @@ package repo
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
+	"github.com/and-gorbik/dynamodb-device-token/model"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
 var (
-	tableName = "device_token"
+	tableName = "device"
 
-	fieldUserID      = "user_id"
-	fieldKind        = "kind"
-	fieldModifiedAt  = "modified_at"
-	fieldToken       = "token"
-	fieldAppVersion  = "app_version"
-	fieldDeviceModel = "device_model"
+	fieldUserID          = "user_id"
+	fieldKindDeviceModel = "kind_device_model"
+	fieldModifiedAt      = "modified_at"
+	fieldToken           = "token"
+	fieldAppVersion      = "app_version"
+	fieldLocale          = "locale"
 
 	maxDurationOfTableCreation = time.Minute * 5
 )
@@ -52,4 +54,45 @@ func printTPtr[T any](val *T) string {
 	}
 
 	return fmt.Sprintf("%v", *val)
+}
+
+func ToItem(d *model.Device) map[string]types.AttributeValue {
+	return map[string]types.AttributeValue{
+		fieldUserID:          &types.AttributeValueMemberN{Value: d.PartitionKey()},
+		fieldKindDeviceModel: &types.AttributeValueMemberS{Value: d.SortKey()},
+		fieldModifiedAt:      &types.AttributeValueMemberN{Value: strconv.FormatInt(d.ModifiedAt, 10)},
+		fieldToken:           &types.AttributeValueMemberS{Value: d.Token},
+		fieldAppVersion:      &types.AttributeValueMemberS{Value: d.AppVersion},
+		fieldLocale:          &types.AttributeValueMemberS{Value: d.Locale},
+	}
+}
+
+func ToKey(pk, sk string) map[string]types.AttributeValue {
+	return map[string]types.AttributeValue{
+		fieldUserID:          &types.AttributeValueMemberN{Value: pk},
+		fieldKindDeviceModel: &types.AttributeValueMemberS{Value: sk},
+	}
+}
+
+func ToPartitionKey(pk string) map[string]types.AttributeValue {
+	return map[string]types.AttributeValue{
+		fieldUserID: &types.AttributeValueMemberN{Value: pk},
+	}
+}
+
+func FromItem(item map[string]types.AttributeValue) *model.Device {
+	userID, _ := strconv.ParseInt(item[fieldUserID].(*types.AttributeValueMemberN).Value, 10, 64)
+	modifiedAt, _ := strconv.ParseInt(item[fieldModifiedAt].(*types.AttributeValueMemberN).Value, 10, 64)
+
+	d := model.Device{
+		UserID:     userID,
+		ModifiedAt: modifiedAt,
+		Token:      item[fieldToken].(*types.AttributeValueMemberS).Value,
+		AppVersion: item[fieldAppVersion].(*types.AttributeValueMemberS).Value,
+		Locale:     item[fieldLocale].(*types.AttributeValueMemberS).Value,
+	}
+
+	d.SetSortKey(item[fieldKindDeviceModel].(*types.AttributeValueMemberS).Value)
+
+	return &d
 }
