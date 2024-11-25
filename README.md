@@ -10,12 +10,12 @@
 ### Модель данных
 
 device:
-    - PartitionKey(user_id int64)
-    - SortKey(kind, device_model string)
-    - modified_at int64
-    - token string
-    - app_version string
-    - locale string
+- PartitionKey(user_id int64)
+- SortKey(kind, device_model string)
+- modified_at int64
+- token string
+- app_version string
+- locale string
 
 > Device model нужен в ключе, чтобы поддержать фичу мультидевайс
 > По полю modified_at удобно настроить TTL
@@ -46,6 +46,13 @@ go run ./cmd/db-manager --command delete
 ```bash
 go run ./cmd/db-manager --command apply
 ```
+
+#### Включить стрим
+```bash
+go run ./cmd/db-manager --command enable-stream
+```
+
+возвращает stream id
 
 #### Добавить элемент
 

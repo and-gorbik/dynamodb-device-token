@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	command := flag.String("command", "", "command to apply; can either be 'create', 'apply' or 'delete'")
+	command := flag.String("command", "", "command to apply; can either be 'create', 'apply', 'delete' or 'enable-stream'")
 	flag.Parse()
 
 	if *command == "" {
@@ -35,6 +35,8 @@ func main() {
 		apply(ctx, r)
 	case "delete":
 		delete(ctx, r)
+	case "enable-stream":
+		enableStream(ctx, r)
 	default:
 		log.Fatalf("unknown command: %s\n", *command)
 	}
@@ -64,6 +66,15 @@ func delete(ctx context.Context, r *repo.Repository) {
 	if err := r.DropTable(ctx); err != nil {
 		log.Fatalf("drop table: %s\n", err)
 	}
+}
+
+func enableStream(ctx context.Context, r *repo.Repository) {
+	streamID, err := r.EnableStreaming(ctx)
+	if err != nil {
+		log.Fatalf("enable stream: %s\n", err)
+	}
+
+	log.Println("stream id: ", streamID)
 }
 
 func parseRecords(path string) ([]model.Device, error) {
