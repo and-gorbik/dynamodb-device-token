@@ -16,9 +16,9 @@ device:
 - token string
 - app_version string
 - locale string
+- ttl int64
 
 > Device model нужен в ключе, чтобы поддержать фичу мультидевайс
-> По полю modified_at удобно настроить TTL
 
 Проблемы:
 - Для однозначного определения токена нужно знать device_model. В текущей реализации мы знаем device model только во время UpdateUserData. Для SendPush придется вытаскивать токены по user_id и kind (при помощи фильтра `begins_with`), после чего 
