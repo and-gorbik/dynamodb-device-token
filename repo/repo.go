@@ -19,6 +19,7 @@ var (
 	fieldToken           = "token"
 	fieldAppVersion      = "app_version"
 	fieldLocale          = "locale"
+	fieldTTL             = "ttl"
 
 	maxDurationOfTableCreation = time.Minute * 5
 )
@@ -64,6 +65,7 @@ func ToItem(d *model.Device) map[string]types.AttributeValue {
 		fieldToken:           &types.AttributeValueMemberS{Value: d.Token},
 		fieldAppVersion:      &types.AttributeValueMemberS{Value: d.AppVersion},
 		fieldLocale:          &types.AttributeValueMemberS{Value: d.Locale},
+		fieldTTL:             &types.AttributeValueMemberN{Value: strconv.FormatInt(d.TTL, 10)},
 	}
 }
 

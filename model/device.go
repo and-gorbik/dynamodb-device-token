@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type TokenKind string
@@ -23,6 +24,7 @@ type Device struct {
 	Token       string    `json:"token"`
 	AppVersion  string    `json:"app_version"`
 	Locale      string    `json:"locale"`
+	TTL         int64     `json:"ttl"`
 }
 
 func (d *Device) PartitionKey() string {
@@ -37,4 +39,8 @@ func (d *Device) SetSortKey(sortKey string) {
 	parts := strings.Split(sortKey, "#")
 	d.Kind = TokenKind(parts[0])
 	d.DeviceModel = parts[1]
+}
+
+func (d *Device) SetTTL() {
+	d.TTL = time.Now().Add(time.Hour * 24 * 90).Unix()
 }

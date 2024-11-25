@@ -58,6 +58,10 @@ func (r *Repository) CreateTable(ctx context.Context) (*types.TableDescription, 
 
 	fmt.Println("Table is now active!")
 
+	if err := r.enableTTL(ctx); err != nil {
+		return nil, fmt.Errorf("enable ttl: %w", err)
+	}
+
 	out, err := r.client.DescribeTable(ctx, &dynamodb.DescribeTableInput{
 		TableName: &tableName,
 	})
@@ -66,4 +70,19 @@ func (r *Repository) CreateTable(ctx context.Context) (*types.TableDescription, 
 	}
 
 	return out.Table, nil
+}
+
+func (r *Repository) enableTTL(ctx context.Context) error {
+	_, err := r.client.UpdateTimeToLive(ctx, &dynamodb.UpdateTimeToLiveInput{
+		TableName: aws.String(tableName),
+		TimeToLiveSpecification: &types.TimeToLiveSpecification{
+			AttributeName: aws.String(fieldTTL),
+			Enabled:       aws.Bool(true),
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -13,6 +13,8 @@ import (
 )
 
 func (r *Repository) Put(ctx context.Context, d model.Device) error {
+	d.SetTTL()
+
 	out, err := r.client.PutItem(ctx, &dynamodb.PutItemInput{
 		TableName:              aws.String(tableName),
 		Item:                   ToItem(&d),
@@ -29,6 +31,7 @@ func (r *Repository) Put(ctx context.Context, d model.Device) error {
 func (r *Repository) InsertBulk(ctx context.Context, dd []model.Device) error {
 	reqs := make([]types.WriteRequest, 0, len(dd))
 	for _, d := range dd {
+		d.SetTTL()
 		reqs = append(reqs, types.WriteRequest{
 			PutRequest: &types.PutRequest{
 				Item: ToItem(&d),
