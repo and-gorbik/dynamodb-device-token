@@ -11,7 +11,7 @@
 
 device:
 - PartitionKey(user_id int64)
-- SortKey(kind, device_model string)
+- SortKey(kind, device_model string) или SortKey("latest_device")
 - modified_at int64
 - token string
 - app_version string
@@ -58,6 +58,11 @@ go run ./cmd/db-manager --command enable-stream
 
 ```bash
 go run ./cmd/api --command put --data '{"user_id": 10, "modified_at": 12345, "kind": "android_general", "device_model": "redmi note 5", "token": "AAA-BBB-CCC-DDDEF", "app_version": "", "locale": "ru"}'
+```
+
+#### Добавить элемент и отметить его последним
+```bash
+go run ./cmd/api --command put --data '{"user_id": 10, "modified_at": 12345, "kind": "android_general", "device_model": "redmi note 5", "token": "AAA-BBB-CCC-DDDEF", "app_version": "", "locale": "ru", "latest": true}'
 ```
 
 #### Получить несколько записей

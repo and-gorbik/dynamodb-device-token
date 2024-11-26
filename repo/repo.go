@@ -20,6 +20,8 @@ var (
 	fieldAppVersion      = "app_version"
 	fieldLocale          = "locale"
 	fieldTTL             = "ttl"
+	fieldKind            = "kind"
+	fieldDeviceModel     = "device_model"
 
 	maxDurationOfTableCreation = time.Minute * 5
 )
@@ -57,15 +59,17 @@ func printTPtr[T any](val *T) string {
 	return fmt.Sprintf("%v", *val)
 }
 
-func ToItem(d *model.Device) map[string]types.AttributeValue {
+func ToItem(d *model.Device, isLatest bool) map[string]types.AttributeValue {
 	return map[string]types.AttributeValue{
 		fieldUserID:          &types.AttributeValueMemberN{Value: d.PartitionKey()},
-		fieldKindDeviceModel: &types.AttributeValueMemberS{Value: d.SortKey()},
+		fieldKindDeviceModel: &types.AttributeValueMemberS{Value: sortKey(d, isLatest)},
 		fieldModifiedAt:      &types.AttributeValueMemberN{Value: strconv.FormatInt(d.ModifiedAt, 10)},
 		fieldToken:           &types.AttributeValueMemberS{Value: d.Token},
 		fieldAppVersion:      &types.AttributeValueMemberS{Value: d.AppVersion},
 		fieldLocale:          &types.AttributeValueMemberS{Value: d.Locale},
 		fieldTTL:             &types.AttributeValueMemberN{Value: strconv.FormatInt(d.TTL, 10)},
+		fieldDeviceModel:     &types.AttributeValueMemberS{Value: d.DeviceModel},
+		fieldKind:            &types.AttributeValueMemberS{Value: string(d.Kind)},
 	}
 }
 
@@ -94,7 +98,26 @@ func FromItem(item map[string]types.AttributeValue) *model.Device {
 		Locale:     item[fieldLocale].(*types.AttributeValueMemberS).Value,
 	}
 
-	d.SetSortKey(item[fieldKindDeviceModel].(*types.AttributeValueMemberS).Value)
+	sortKey := item[fieldKindDeviceModel].(*types.AttributeValueMemberS).Value
+	if sortKey != latestSortKey {
+		d.SetSortKey(sortKey)
+	} else {
+		d.Kind = model.TokenKind(item[fieldKind].(*types.AttributeValueMemberS).Value)
+		d.DeviceModel = item[fieldDeviceModel].(*types.AttributeValueMemberS).Value
+	}
 
 	return &d
+}
+
+const (
+	keyVersion    = "v0"
+	latestSortKey = "latest_device"
+)
+
+func sortKey(d *model.Device, latest bool) string {
+	if latest {
+		return fmt.Sprintf("%s#%s#%s", keyVersion, d.Kind, latestSortKey)
+	}
+
+	return "v0#" + d.SortKey()
 }

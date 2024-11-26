@@ -15,16 +15,44 @@ import (
 func (r *Repository) Put(ctx context.Context, d model.Device) error {
 	d.SetTTL()
 
-	out, err := r.client.PutItem(ctx, &dynamodb.PutItemInput{
-		TableName:              aws.String(tableName),
-		Item:                   ToItem(&d),
-		ReturnConsumedCapacity: types.ReturnConsumedCapacityTotal,
-	})
-	if err != nil {
-		return fmt.Errorf("insert one: %w", err)
+	if !d.Latest {
+		out, err := r.client.PutItem(ctx, &dynamodb.PutItemInput{
+			TableName:              aws.String(tableName),
+			Item:                   ToItem(&d, false),
+			ReturnConsumedCapacity: types.ReturnConsumedCapacityTotal,
+		})
+		if err != nil {
+			return fmt.Errorf("put item: %w", err)
+		}
+
+		log.Printf("[insert one] %s\n", (*printableConsumedCapacity)(out.ConsumedCapacity))
+		return nil
 	}
 
-	log.Printf("[insert one] %s\n", (*printableConsumedCapacity)(out.ConsumedCapacity))
+	out, err := r.client.BatchWriteItem(ctx, &dynamodb.BatchWriteItemInput{
+		RequestItems: map[string][]types.WriteRequest{
+			tableName: {
+				{
+					PutRequest: &types.PutRequest{
+						Item: ToItem(&d, true),
+					},
+				},
+				{
+					PutRequest: &types.PutRequest{
+						Item: ToItem(&d, false),
+					},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("insert two records: %w", err)
+	}
+
+	for _, cc := range out.ConsumedCapacity {
+		log.Printf("[insert] %s\n", printableConsumedCapacity(cc))
+	}
+
 	return nil
 }
 
@@ -34,7 +62,7 @@ func (r *Repository) InsertBulk(ctx context.Context, dd []model.Device) error {
 		d.SetTTL()
 		reqs = append(reqs, types.WriteRequest{
 			PutRequest: &types.PutRequest{
-				Item: ToItem(&d),
+				Item: ToItem(&d, false),
 			},
 		})
 	}

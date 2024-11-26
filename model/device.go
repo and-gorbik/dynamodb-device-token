@@ -25,6 +25,7 @@ type Device struct {
 	AppVersion  string    `json:"app_version"`
 	Locale      string    `json:"locale"`
 	TTL         int64     `json:"ttl"`
+	Latest      bool      `json:"latest,omitempty"`
 }
 
 func (d *Device) PartitionKey() string {
