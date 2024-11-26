@@ -18,6 +18,7 @@ func main() {
 	pk := flag.String("pk", "", "partition key value")
 	sk := flag.String("sort", "", "sort key value")
 	data := flag.String("data", "", "item represented as json")
+	latest := flag.Bool("latest", false, "if true, the latest device will be returned")
 	flag.Parse()
 
 	if *command == "" {
@@ -31,7 +32,7 @@ func main() {
 
 	switch *command {
 	case "get":
-		get(ctx, r, *pk, *sk)
+		get(ctx, r, *pk, *sk, *latest)
 	case "put":
 		put(ctx, r, *data)
 	case "delete":
@@ -39,7 +40,7 @@ func main() {
 	}
 }
 
-func get(ctx context.Context, r *repo.Repository, partitionKey, sortKey string) {
+func get(ctx context.Context, r *repo.Repository, partitionKey, sortKey string, latest bool) {
 	if partitionKey == "" {
 		log.Fatalln("partition key is required")
 	}
@@ -51,6 +52,16 @@ func get(ctx context.Context, r *repo.Repository, partitionKey, sortKey string) 
 	userID, err := strconv.ParseInt(partitionKey, 10, 64)
 	if err != nil {
 		log.Fatalf("parse int: %v\n", err)
+	}
+
+	if latest {
+		device, err := r.GetLatestDevice(ctx, userID, model.TokenKind(sortKey))
+		if err != nil {
+			log.Fatalf("get latest device: %v\n", err)
+		}
+
+		printTokens([]model.Device{*device})
+		return
 	}
 
 	devices, err := r.GetDeviceList(ctx, userID, model.TokenKind(sortKey))
