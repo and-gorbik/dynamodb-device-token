@@ -74,3 +74,8 @@ go run ./cmd/api --command get --pk 1 --sort 'ios_general'
 ```bash
 go run ./cmd/api --command delete --pk 1 --sort 'ios_general#iphone 13'
 ```
+
+#### Добавить реплику в другой регион
+```bash
+go run ./cmd/db-manager --command make-global-table --region us-east-1 --replica-region eu-central-1
+```

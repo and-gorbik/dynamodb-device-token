@@ -7,13 +7,16 @@ import (
 	"log"
 	"time"
 
-	"github.com/and-gorbik/dynamodb-device-token/db"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodbstreams"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodbstreams/types"
+
+	"github.com/and-gorbik/dynamodb-device-token/db"
+	"github.com/and-gorbik/dynamodb-device-token/region"
 )
 
 func main() {
 	streamID := flag.String("stream-id", "", "stream id from './cmd/db-manager --command enable-stream'")
+	reg := flag.String("region", region.Default(), "set up the region")
 	flag.Parse()
 
 	ctx := context.Background()
@@ -22,7 +25,11 @@ func main() {
 		log.Fatal("stream id is not provided")
 	}
 
-	client := db.InitDynamoDBStreamClient(ctx)
+	if !region.In(*reg) {
+		log.Fatalf("unknown region: %s\n", *reg)
+	}
+
+	client := db.InitDynamoDBStreamClient(ctx, *reg)
 	startStreaming(ctx, client, *streamID)
 }
 

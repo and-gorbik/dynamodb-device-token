@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func InitDynamoDBStreamClient(ctx context.Context) *dynamodbstreams.Client {
+func InitDynamoDBStreamClient(ctx context.Context, region string) *dynamodbstreams.Client {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal(err)
 	}

@@ -34,10 +34,7 @@ func (r *Repository) CreateTable(ctx context.Context) (*types.TableDescription, 
 				KeyType:       types.KeyTypeRange, // sort key - not required, only one is possibly
 			},
 		},
-		ProvisionedThroughput: &types.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(1),
-			WriteCapacityUnits: aws.Int64(1),
-		},
+		BillingMode: types.BillingModePayPerRequest,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("create table: %w", err)

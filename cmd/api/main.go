@@ -10,6 +10,7 @@ import (
 
 	"github.com/and-gorbik/dynamodb-device-token/db"
 	"github.com/and-gorbik/dynamodb-device-token/model"
+	"github.com/and-gorbik/dynamodb-device-token/region"
 	"github.com/and-gorbik/dynamodb-device-token/repo"
 )
 
@@ -19,15 +20,20 @@ func main() {
 	sk := flag.String("sort", "", "sort key value")
 	data := flag.String("data", "", "item represented as json")
 	latest := flag.Bool("latest", false, "if true, the latest device will be returned")
+	reg := flag.String("region", region.Default(), "set up the region")
 	flag.Parse()
 
 	if *command == "" {
 		log.Fatal("param 'command' is required")
 	}
 
+	if !region.In(*reg) {
+		log.Fatalf("unknown region: %s\n", *reg)
+	}
+
 	ctx := context.Background()
 
-	client := db.InitDynamoDBClient(ctx)
+	client := db.InitDynamoDBClient(ctx, *reg)
 	r := repo.Init(client)
 
 	switch *command {
