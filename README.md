@@ -79,3 +79,11 @@ go run ./cmd/api --command delete --pk 1 --sort 'ios_general#iphone 13'
 ```bash
 go run ./cmd/db-manager --command make-global-table --region us-east-1 --replica-region eu-central-1
 ```
+
+### Запуск в Docker
+
+```bash
+docker run -it --rm --name dynamodb-local -p 8000:8000 amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -sharedDb
+npm install -g dynamodb-admin
+dynamodb-admin
+```

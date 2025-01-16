@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 
@@ -32,7 +33,9 @@ func main() {
 
 	ctx := context.Background()
 
-	client := db.InitDynamoDBClient(ctx, *reg)
+	dev, _ := strconv.ParseBool(os.Getenv("DEV"))
+
+	client := db.InitDynamoDBClient(ctx, *reg, dev)
 	r := repo.Init(client)
 
 	switch *command {

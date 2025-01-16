@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 
@@ -33,7 +34,9 @@ func main() {
 
 	ctx := context.Background()
 
-	client := db.InitDynamoDBClient(ctx, *reg)
+	dev, _ := strconv.ParseBool(os.Getenv("DEV"))
+
+	client := db.InitDynamoDBClient(ctx, *reg, dev)
 	r := repo.Init(client)
 
 	switch *command {
