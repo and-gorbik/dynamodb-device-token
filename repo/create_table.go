@@ -18,7 +18,7 @@ func (r *Repository) CreateTable(ctx context.Context) (*types.TableDescription, 
 				AttributeType: types.ScalarAttributeTypeN,
 			},
 			{
-				AttributeName: aws.String(fieldKind),
+				AttributeName: aws.String(fieldKindDeviceModel),
 				AttributeType: types.ScalarAttributeTypeS,
 			},
 		},
@@ -30,14 +30,11 @@ func (r *Repository) CreateTable(ctx context.Context) (*types.TableDescription, 
 				KeyType:       types.KeyTypeHash, // partition key - required, exactly one
 			},
 			{
-				AttributeName: aws.String(fieldKind),
+				AttributeName: aws.String(fieldKindDeviceModel),
 				KeyType:       types.KeyTypeRange, // sort key - not required, only one is possibly
 			},
 		},
-		ProvisionedThroughput: &types.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(1),
-			WriteCapacityUnits: aws.Int64(1),
-		},
+		BillingMode: types.BillingModePayPerRequest,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("create table: %w", err)
@@ -58,6 +55,10 @@ func (r *Repository) CreateTable(ctx context.Context) (*types.TableDescription, 
 
 	fmt.Println("Table is now active!")
 
+	if err := r.enableTTL(ctx); err != nil {
+		return nil, fmt.Errorf("enable ttl: %w", err)
+	}
+
 	out, err := r.client.DescribeTable(ctx, &dynamodb.DescribeTableInput{
 		TableName: &tableName,
 	})
@@ -66,4 +67,19 @@ func (r *Repository) CreateTable(ctx context.Context) (*types.TableDescription, 
 	}
 
 	return out.Table, nil
+}
+
+func (r *Repository) enableTTL(ctx context.Context) error {
+	_, err := r.client.UpdateTimeToLive(ctx, &dynamodb.UpdateTimeToLiveInput{
+		TableName: aws.String(tableName),
+		TimeToLiveSpecification: &types.TimeToLiveSpecification{
+			AttributeName: aws.String(fieldTTL),
+			Enabled:       aws.Bool(true),
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

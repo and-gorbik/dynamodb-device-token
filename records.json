@@ -1,12 +1,13 @@
 [
-    {"user_id": 1, "kind": "android_general", "modified_at": 123456, "token": "AAA-BBB-CCC-DDD", "app_version": "v4.9.9", "device_model": ""},
-    {"user_id": 1, "kind": "ios_general", "modified_at": 123457, "token": "ABC-DEF-XYZ", "app_version": "v5.0.0", "device_model": "iphone 13"},
-    {"user_id": 2, "kind": "ios_general", "modified_at": 123458, "token": "AAA-BBB-CCC-DD1", "app_version": "v5.0.0", "device_model": "iphone 15"},
-    {"user_id": 3, "kind": "android_general", "modified_at": 123459, "token": "AA-BBB-CCC-DDD", "app_version": "v4.9.8", "device_model": ""},
-    {"user_id": 3, "kind": "ios_general", "modified_at": 123460, "token": "A3A-BBB-CCC-000", "app_version": "v4.8.5", "device_model": "iphone pro 14"},
-    {"user_id": 4, "kind": "android_general", "modified_at": 123461, "token": "AA4-BCB-CCC-DDD", "app_version": "", "device_model": ""},
-    {"user_id": 5, "kind": "android_general", "modified_at": 123462, "token": "AAA-BGG-FFF-555", "app_version": "", "device_model": ""},
-    {"user_id": 6, "kind": "android_general", "modified_at": 123463, "token": "ABC-BBB-CCC-DDD", "app_version": "", "device_model": ""},
-    {"user_id": 7, "kind": "android_general", "modified_at": 123464, "token": "PPP-QQQ-SSS-RRR", "app_version": "", "device_model": ""},
-    {"user_id": 8, "kind": "android_general", "modified_at": 123465, "token": "ZZZ-BBB-CCC-DDD", "app_version": "", "device_model": ""}
+    {"user_id": 1, "kind": "android_general", "device_model": "redmi note 5", "modified_at": 123456, "token": "AAA-BBB-CCC-DDD", "app_version": "v4.9.9", "locale": "ru"},
+    {"user_id": 1, "kind": "ios_general", "device_model": "iphone 13", "modified_at": 123457, "token": "ABC-DEF-XYZ", "app_version": "v5.0.0", "locale": "ru"},
+    {"user_id": 1, "kind": "ios_general", "device_model": "iphone 14", "modified_at": 123600, "token": "ABC-DEF-PQS", "app_version": "v5.0.0", "locale": "ru"},
+    {"user_id": 2, "kind": "ios_general", "device_model": "", "modified_at": 123458, "token": "AAA-BBB-CCC-DD1", "app_version": "v5.0.0", "locale": "ru"},
+    {"user_id": 3, "kind": "android_general", "device_model": "", "modified_at": 123459, "token": "AA-BBB-CCC-DDD", "app_version": "v4.9.8", "locale": "ru"},
+    {"user_id": 3, "kind": "ios_general", "device_model": "", "modified_at": 123460, "token": "A3A-BBB-CCC-000", "app_version": "v4.8.5", "locale": "ru"},
+    {"user_id": 4, "kind": "android_general", "device_model": "", "modified_at": 123461, "token": "AA4-BCB-CCC-DDD", "app_version": "", "locale": "ru"},
+    {"user_id": 5, "kind": "android_general", "device_model": "", "modified_at": 123462, "token": "AAA-BGG-FFF-555", "app_version": "", "locale": "ru"},
+    {"user_id": 6, "kind": "android_general", "device_model": "", "modified_at": 123463, "token": "ABC-BBB-CCC-DDD", "app_version": "", "locale": "ru"},
+    {"user_id": 7, "kind": "android_general", "device_model": "", "modified_at": 123464, "token": "PPP-QQQ-SSS-RRR", "app_version": "", "locale": "ru"},
+    {"user_id": 8, "kind": "android_general", "device_model": "", "modified_at": 123465, "token": "ZZZ-BBB-CCC-DDD", "app_version": "", "locale": "ru"}
 ]
